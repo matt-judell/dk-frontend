@@ -1,0 +1,29 @@
+{
+  "show_completions_on_input": false,
+  "show_inline_completions": false,
+
+  "assistant": {
+    "enabled": false,
+  },
+  "agent": {
+    "single_file_review": true
+  },
+  "features": {
+    "inline_completion_provider": "none",
+    "copilot": false,
+  },
+
+  "git": {
+    "git_gutter": "tracked_files",
+  },
+  "languages": {
+    "Python": {
+      "language_servers": ["pyright", "pylsp"],
+      "show_completions_on_input": false,
+      "show_inline_completions": false,
+      "capabilities": {
+        "completion": false,
+      },
+    },
+  },
+}
