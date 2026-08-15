@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Denmark Entities · Explorer</title>
+
+    <!-- Base map (MapLibre GL, no access token required) -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/maplibre-gl@4/dist/maplibre-gl.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/maplibre-gl@4/dist/maplibre-gl.js"></script>
+
+    <!-- deck.gl standalone scripting bundle (exposes global `deck`) -->
+    <script src="https://cdn.jsdelivr.net/npm/deck.gl@9/dist.min.js"></script>
+
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <div id="map"></div>
+
+    <div class="overlay-panel title-panel">
+      <h1>Denmark Entities</h1>
+      <p>
+        Every marker is a company (CVR), shown at its most recent registered
+        location. Click a marker to see its financial history.
+      </p>
+    </div>
+
+    <div class="overlay-panel status-panel" id="status">
+      <span class="spinner"></span>
+      <span>Loading data…</span>
+    </div>
+
+    <script type="module" src="js/landing.js"></script>
+  </body>
+</html>
