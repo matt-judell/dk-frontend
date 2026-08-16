@@ -14,9 +14,17 @@ function showMessage(text, isError = false) {
   contentEl.innerHTML = `<div class="message${isError ? " error" : ""}">${text}</div>`;
 }
 
-function numberCell(value, { currency = true } = {}) {
+function numberCell(value, { currency = true, decimals = null } = {}) {
   if (value === null || value === undefined) return "<td>—</td>";
-  const text = currency ? formatCurrency(value) : formatNumber(value);
+  let text;
+  if (decimals !== null) {
+    text = value.toLocaleString("en-US", {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+    });
+  } else {
+    text = currency ? formatCurrency(value) : formatNumber(value);
+  }
   const cls = value < 0 ? ' class="neg"' : "";
   return `<td${cls}>${text}</td>`;
 }
@@ -82,7 +90,7 @@ function render(cvr, filings) {
         ${numberCell(f.cash)}
         ${numberCell(f.netIncome)}
         ${numberCell(f.price)}
-        ${numberCell(f.multiple, { currency: false })}
+        ${numberCell(f.multiple, { currency: false, decimals: 2 })}
       </tr>`
     )
     .join("");
