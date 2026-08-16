@@ -89,11 +89,30 @@
         <button id="zoom-matches" type="button">Zoom to matches</button>
         <button id="reset-filters" type="button" class="secondary">Reset</button>
       </div>
+      <button id="view-table" type="button" class="view-table-btn">
+        View as table
+      </button>
     </div>
 
     <div class="overlay-panel status-panel" id="status">
       <span class="spinner"></span>
       <span>Loading data…</span>
+    </div>
+
+    <div id="table-view" class="table-view hidden">
+      <div class="table-view-header">
+        <h2><span id="table-count">0</span> entities</h2>
+        <button id="close-table" type="button" class="secondary">
+          ← Back to map
+        </button>
+      </div>
+      <div class="table-view-body">
+        <table>
+          <thead id="table-head"></thead>
+          <tbody id="table-body"></tbody>
+        </table>
+        <p id="table-note" class="table-note"></p>
+      </div>
     </div>
 
     <script type="module" src="js/landing.js"></script>

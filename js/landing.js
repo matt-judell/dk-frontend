@@ -38,6 +38,66 @@ let deckgl;
 let viewState = INITIAL_VIEW_STATE;
 let allPoints = []; // newest filing per CVR, with coordinates
 let filtered = [];
+let tableVisible = false;
+let sortKey = "price";
+let sortDir = "desc";
+
+// Cap DOM rows so a huge unfiltered result set doesn't freeze the page.
+const MAX_TABLE_ROWS = 1000;
+
+// Street address without the city (city gets its own column).
+function addressText(p) {
+  const street = [p.streetName, p.houseNumber].filter(Boolean).join(" ");
+  return [street, p.postalCode].filter(Boolean).join(", ");
+}
+
+function cityText(p) {
+  return p.city || p.postalDistrict || "";
+}
+
+// Column definitions: `get` returns the raw value (for sorting), `render`
+// returns the display cell HTML. `numeric` columns sort numerically.
+const TABLE_COLUMNS = [
+  {
+    key: "name",
+    label: "Name",
+    get: (p) => p.name || "",
+    render: (p) => escapeHtml(p.name || "Unknown"),
+  },
+  {
+    key: "cvr",
+    label: "CVR",
+    numeric: true,
+    get: (p) => p.cvr,
+    render: (p) => p.cvr,
+  },
+  {
+    key: "address",
+    label: "Address",
+    get: (p) => addressText(p),
+    render: (p) => (addressText(p) ? escapeHtml(addressText(p)) : "—"),
+  },
+  {
+    key: "city",
+    label: "City",
+    get: (p) => cityText(p),
+    render: (p) => (cityText(p) ? escapeHtml(cityText(p)) : "—"),
+  },
+  {
+    key: "employees",
+    label: "Employees",
+    numeric: true,
+    get: (p) => p.employees,
+    render: (p) => (p.employees !== null ? formatNumber(p.employees) : "—"),
+  },
+  {
+    key: "price",
+    label: "Price",
+    numeric: true,
+    get: (p) => p.price,
+    render: (p) => (p.price !== null ? formatCurrency(p.price) : "—"),
+  },
+];
 
 // ---------------------------------------------------------------------------
 // View-state control (needed so we can programmatically fly/fit the camera)
@@ -238,12 +298,87 @@ function applyFilters() {
 
   updateLayer();
   updateStatus();
+  if (tableVisible) renderTable();
 }
 
 let debounceTimer = null;
 function scheduleFilter() {
   clearTimeout(debounceTimer);
   debounceTimer = setTimeout(applyFilters, 150);
+}
+
+// ---------------------------------------------------------------------------
+// Table view
+// ---------------------------------------------------------------------------
+
+function compareBy(col, dir) {
+  const s = dir === "asc" ? 1 : -1;
+  return (a, b) => {
+    const va = col.get(a);
+    const vb = col.get(b);
+    const na = va === null || va === undefined || va === "";
+    const nb = vb === null || vb === undefined || vb === "";
+    if (na && nb) return 0;
+    if (na) return 1; // missing values always sort last
+    if (nb) return -1;
+    if (col.numeric) return (va - vb) * s;
+    return String(va).localeCompare(String(vb)) * s;
+  };
+}
+
+function renderHeader() {
+  document.getElementById("table-head").innerHTML = `<tr>${TABLE_COLUMNS.map(
+    (col) => {
+      const active = col.key === sortKey;
+      const indicator = active ? (sortDir === "asc" ? " ▲" : " ▼") : "";
+      return `<th data-key="${col.key}" class="sortable${
+        active ? " active" : ""
+      }">${col.label}${indicator}</th>`;
+    }
+  ).join("")}</tr>`;
+}
+
+function renderTable() {
+  document.getElementById("table-count").textContent = formatNumber(
+    filtered.length
+  );
+
+  renderHeader();
+
+  const col = TABLE_COLUMNS.find((c) => c.key === sortKey) ?? TABLE_COLUMNS[0];
+  const sorted = [...filtered].sort(compareBy(col, sortDir));
+  const shown = sorted.slice(0, MAX_TABLE_ROWS);
+
+  document.getElementById("table-body").innerHTML = shown
+    .map(
+      (p) =>
+        `<tr data-cvr="${p.cvr}">${TABLE_COLUMNS.map(
+          (c) => `<td>${c.render(p)}</td>`
+        ).join("")}</tr>`
+    )
+    .join("");
+
+  const note = document.getElementById("table-note");
+  if (filtered.length > MAX_TABLE_ROWS) {
+    note.textContent = `Showing ${formatNumber(
+      MAX_TABLE_ROWS
+    )} of ${formatNumber(
+      filtered.length
+    )} matches (current sort). Refine the filters to narrow the list.`;
+  } else {
+    note.textContent = "";
+  }
+}
+
+function showTable() {
+  tableVisible = true;
+  renderTable();
+  document.getElementById("table-view").classList.remove("hidden");
+}
+
+function hideTable() {
+  tableVisible = false;
+  document.getElementById("table-view").classList.add("hidden");
 }
 
 function resetFilters() {
@@ -263,6 +398,29 @@ function wireControls() {
   document
     .getElementById("zoom-matches")
     .addEventListener("click", () => fitToPoints(filtered));
+
+  document.getElementById("view-table").addEventListener("click", showTable);
+  document.getElementById("close-table").addEventListener("click", hideTable);
+
+  // Row click -> detail page (event delegation).
+  document.getElementById("table-body").addEventListener("click", (e) => {
+    const tr = e.target.closest("tr[data-cvr]");
+    if (tr) window.location.href = `detail.html?cvr=${tr.dataset.cvr}`;
+  });
+
+  // Header click -> sort (toggle direction when re-clicking the same column).
+  document.getElementById("table-head").addEventListener("click", (e) => {
+    const th = e.target.closest("th[data-key]");
+    if (!th) return;
+    const key = th.dataset.key;
+    if (key === sortKey) {
+      sortDir = sortDir === "asc" ? "desc" : "asc";
+    } else {
+      sortKey = key;
+      sortDir = "asc";
+    }
+    renderTable();
+  });
 }
 
 // ---------------------------------------------------------------------------
