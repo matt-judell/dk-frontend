@@ -20,12 +20,75 @@
   <body>
     <div id="map"></div>
 
-    <div class="overlay-panel title-panel">
+    <div class="overlay-panel controls-panel">
       <h1>Denmark Entities</h1>
-      <p>
-        Every marker is a company (CVR), shown at its most recent registered
-        location. Click a marker to see its financial history.
+      <p class="panel-hint">
+        One marker per company (CVR), at its latest registered location. Search
+        and filter below, then click a marker for details.
       </p>
+
+      <div class="field">
+        <label for="search">Search name or location</label>
+        <input
+          id="search"
+          type="search"
+          placeholder="e.g. Novo, København, 8000…"
+          autocomplete="off"
+        />
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="price-min">Price min</label>
+          <input
+            id="price-min"
+            type="text"
+            inputmode="decimal"
+            autocomplete="off"
+            placeholder="Any"
+          />
+        </div>
+        <div class="field">
+          <label for="price-max">Price max</label>
+          <input
+            id="price-max"
+            type="text"
+            inputmode="decimal"
+            autocomplete="off"
+            placeholder="Any"
+          />
+        </div>
+      </div>
+      <div class="field-hint" id="price-hint">&nbsp;</div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="emp-min">Employees min</label>
+          <input
+            id="emp-min"
+            type="text"
+            inputmode="numeric"
+            autocomplete="off"
+            placeholder="Any"
+          />
+        </div>
+        <div class="field">
+          <label for="emp-max">Employees max</label>
+          <input
+            id="emp-max"
+            type="text"
+            inputmode="numeric"
+            autocomplete="off"
+            placeholder="Any"
+          />
+        </div>
+      </div>
+      <div class="field-hint" id="emp-hint">&nbsp;</div>
+
+      <div class="controls-actions">
+        <button id="zoom-matches" type="button">Zoom to matches</button>
+        <button id="reset-filters" type="button" class="secondary">Reset</button>
+      </div>
     </div>
 
     <div class="overlay-panel status-panel" id="status">
