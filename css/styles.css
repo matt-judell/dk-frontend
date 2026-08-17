@@ -418,6 +418,10 @@ tbody tr:hover {
   background: var(--panel-muted);
 }
 
+tbody tr.clickable {
+  cursor: pointer;
+}
+
 .neg {
   color: var(--danger);
 }

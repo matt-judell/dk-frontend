@@ -79,11 +79,15 @@ function render(cvr, filings) {
     .filter(Boolean)
     .join("");
 
-  // Table rows: newest first for readability.
+  // Table rows: newest first for readability. Rows with a filing URL are
+  // clickable and open that specific filing.
   const tableRows = [...filings]
     .reverse()
-    .map(
-      (f) => `<tr>
+    .map((f) => {
+      const clickable = f.filingUrl
+        ? ` class="clickable" data-url="${escapeHtml(f.filingUrl)}"`
+        : "";
+      return `<tr${clickable}>
         <td>${f.filingDate ?? "—"}</td>
         ${numberCell(f.assets)}
         ${numberCell(f.debt)}
@@ -91,8 +95,8 @@ function render(cvr, filings) {
         ${numberCell(f.netIncome)}
         ${numberCell(f.price)}
         ${numberCell(f.multiple, { currency: false, decimals: 2 })}
-      </tr>`
-    )
+      </tr>`;
+    })
     .join("");
 
   contentEl.innerHTML = `
@@ -124,13 +128,20 @@ function render(cvr, filings) {
             <th>Multiple</th>
           </tr>
         </thead>
-        <tbody>${tableRows}</tbody>
+        <tbody id="history-body">${tableRows}</tbody>
       </table>
       <p style="font-size:12px;color:var(--text-muted);margin:12px 0 0">
-        Monetary values shown in the source units (DKK).
+        Monetary values shown in the source units (DKK). Click a row to open its
+        filing.
       </p>
     </section>
   `;
+
+  // Row click -> open that filing's document in a new tab.
+  document.getElementById("history-body").addEventListener("click", (e) => {
+    const tr = e.target.closest("tr[data-url]");
+    if (tr) window.open(tr.dataset.url, "_blank", "noopener");
+  });
 
   renderChart(filings);
 }
