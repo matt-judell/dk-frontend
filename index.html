@@ -21,6 +21,17 @@
     <div id="map"></div>
 
     <div class="overlay-panel controls-panel" id="controls-panel">
+      <button
+        id="toggle-controls"
+        class="controls-toggle"
+        type="button"
+        aria-controls="controls-body"
+        aria-expanded="true"
+      >
+        <span>Search &amp; filters</span>
+        <span class="chevron">⌄</span>
+      </button>
+
       <div class="controls-body" id="controls-body">
         <div class="field">
         <label for="search">Search name or location</label>
@@ -88,7 +99,6 @@
           View as table
         </button>
       </div>
-      <div class="resize-handle" id="resize-handle" aria-hidden="true"></div>
     </div>
 
     <div class="overlay-panel status-panel" id="status">
