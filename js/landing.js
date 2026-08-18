@@ -381,6 +381,53 @@ function hideTable() {
   document.getElementById("table-view").classList.add("hidden");
 }
 
+// Custom pointer-based resizing so the panel is adjustable on touch devices
+// too (native CSS `resize` only responds to a mouse).
+function wireResize() {
+  const panel = document.getElementById("controls-panel");
+  const handle = document.getElementById("resize-handle");
+  if (!panel || !handle) return;
+
+  const MIN_W = 220;
+  const MIN_H = 140;
+  let startX = 0;
+  let startY = 0;
+  let startW = 0;
+  let startH = 0;
+
+  const onMove = (e) => {
+    const maxW = window.innerWidth - panel.offsetLeft - 12;
+    const maxH = window.innerHeight - panel.offsetTop - 12;
+    const w = Math.max(MIN_W, Math.min(startW + (e.clientX - startX), maxW));
+    const h = Math.max(MIN_H, Math.min(startH + (e.clientY - startY), maxH));
+    panel.style.width = `${w}px`;
+    panel.style.height = `${h}px`;
+  };
+
+  const onUp = (e) => {
+    handle.releasePointerCapture?.(e.pointerId);
+    window.removeEventListener("pointermove", onMove);
+    window.removeEventListener("pointerup", onUp);
+  };
+
+  handle.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    const rect = panel.getBoundingClientRect();
+    startX = e.clientX;
+    startY = e.clientY;
+    startW = rect.width;
+    startH = rect.height;
+    // On mobile the panel is anchored via left+right; pin an explicit width so
+    // dragging controls the size from here on.
+    panel.style.right = "auto";
+    panel.style.maxWidth = "none";
+    panel.style.maxHeight = "none";
+    handle.setPointerCapture?.(e.pointerId);
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+  });
+}
+
 function resetFilters() {
   for (const id of ["search", "price-min", "price-max", "emp-min", "emp-max"]) {
     document.getElementById(id).value = "";
@@ -392,6 +439,8 @@ function wireControls() {
   for (const id of ["search", "price-min", "price-max", "emp-min", "emp-max"]) {
     document.getElementById(id).addEventListener("input", scheduleFilter);
   }
+
+  wireResize();
   document
     .getElementById("reset-filters")
     .addEventListener("click", resetFilters);
