@@ -392,6 +392,18 @@ function wireControls() {
   for (const id of ["search", "price-min", "price-max", "emp-min", "emp-max"]) {
     document.getElementById(id).addEventListener("input", scheduleFilter);
   }
+
+  // Collapsible filter panel (starts collapsed on small screens).
+  const panel = document.getElementById("controls-panel");
+  const toggle = document.getElementById("toggle-controls");
+  const setCollapsed = (collapsed) => {
+    panel.classList.toggle("collapsed", collapsed);
+    toggle.setAttribute("aria-expanded", String(!collapsed));
+  };
+  toggle.addEventListener("click", () =>
+    setCollapsed(!panel.classList.contains("collapsed"))
+  );
+  if (window.matchMedia("(max-width: 640px)").matches) setCollapsed(true);
   document
     .getElementById("reset-filters")
     .addEventListener("click", resetFilters);

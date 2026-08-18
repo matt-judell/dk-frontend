@@ -75,9 +75,70 @@ body {
   padding: 16px 18px 18px;
 }
 
+.controls-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
 .controls-panel h1 {
-  margin: 0 0 4px;
+  margin: 0;
   font-size: 18px;
+}
+
+.toggle-controls {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--text);
+  background: var(--panel-muted);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.toggle-controls:hover {
+  border-color: var(--accent);
+}
+
+.chevron {
+  display: inline-block;
+  transition: transform 0.15s ease;
+}
+
+.controls-panel.collapsed .chevron {
+  transform: rotate(-90deg);
+}
+
+.controls-body {
+  margin-top: 12px;
+}
+
+.controls-panel.collapsed .controls-body {
+  display: none;
+}
+
+.controls-panel.collapsed {
+  padding-bottom: 14px;
+}
+
+@media (max-width: 640px) {
+  .controls-panel {
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    width: auto;
+    max-width: none;
+    max-height: calc(100vh - 20px);
+    padding: 12px 14px 14px;
+  }
 }
 
 .panel-hint {
